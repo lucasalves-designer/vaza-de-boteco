@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070b14">
+<title>Vaza de Boteco</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bungee&family=Chakra+Petch:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="bg" aria-hidden="true"><div class="tiles"></div><div id="bokeh"></div><div class="vig"></div><div id="bunting"></div></div>
+
+<main id="app">
+
+  <!-- Abertura -->
+  <section id="splash" class="screen center">
+    <div class="sign" role="img" aria-label="Vaza de Boteco"><span class="s1">VAZA</span><span class="s2">DE BOTECO</span></div>
+    <p class="tag">Aposte quantas vazas vai fazer. Errou, perde cartas.</p>
+    <form id="nameForm" class="glass form">
+      <label for="nick">Seu apelido</label>
+      <input id="nick" maxlength="18" autocomplete="nickname" placeholder="Ex.: Zé do Forró" required>
+      <button class="btn primary big" type="submit" disabled>Sentar na mesa</button>
+    </form>
+    <p id="conn" class="conn" role="status">Conectando ao servidor…</p>
+  </section>
+
+  <!-- Salas -->
+  <section id="browser" class="screen" hidden>
+    <header class="bar">
+      <div class="logo">VAZA <b>DE BOTECO</b></div>
+      <div class="bar-r"><span id="online" class="chip"></span><span id="whoAv" class="av sm"></span><b id="whoName"></b><button class="icon" data-act="settings" aria-label="Som e música">♪</button></div>
+    </header>
+    <div class="grid2">
+      <div class="glass panel">
+        <div class="panel-h"><h2>Salas abertas</h2><button id="refresh" class="btn ghost sm" type="button">Atualizar</button></div>
+        <ul id="roomList" class="rooms"></ul>
+      </div>
+      <div class="side">
+        <form id="createForm" class="glass panel form">
+          <h2>Criar sala</h2>
+          <label for="cName">Nome da sala</label>
+          <input id="cName" maxlength="24" placeholder="Mesa do Zé">
+          <span class="lbl">Jogadores</span>
+          <div class="seg" role="radiogroup" aria-label="Número de jogadores">
+            <label><input type="radio" name="cMax" value="2"><span>2</span></label>
+            <label><input type="radio" name="cMax" value="3"><span>3</span></label>
+            <label><input type="radio" name="cMax" value="4" checked><span>4</span></label>
+          </div>
+          <label class="switch"><input id="cPriv" type="checkbox"><span class="sw"></span><span>Sala privada <small>(só entra quem tem o código)</small></span></label>
+          <button class="btn primary" type="submit">Criar sala</button>
+        </form>
+        <form id="codeForm" class="glass panel form">
+          <h2>Entrar com código</h2>
+          <input id="cCode" maxlength="4" placeholder="ABCD" aria-label="Código da sala" autocapitalize="characters" class="codein">
+          <button class="btn ghost" type="submit">Entrar</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lobby -->
+  <section id="lobby" class="screen" hidden>
+    <header class="bar">
+      <div class="logo">VAZA <b>DE BOTECO</b></div>
+      <div class="bar-r"><button class="icon" data-act="settings" aria-label="Som e música">♪</button><button class="btn ghost sm" id="lobLeave" type="button">Sair da sala</button></div>
+    </header>
+    <div class="grid2 lob">
+      <div class="glass panel">
+        <div class="panel-h"><h2 id="lobName"></h2><span id="lobCount" class="chip"></span></div>
+        <div id="slots" class="slots"></div>
+        <div class="invite">
+          <div><span class="lbl">Código da sala</span><div id="lobCode" class="code"></div></div>
+          <div class="row"><button id="copyCode" class="btn ghost sm" type="button">Copiar código</button><button id="copyLink" class="btn ghost sm" type="button">Copiar link</button></div>
+        </div>
+        <div id="lobActions" class="row end"></div>
+      </div>
+      <div id="lobChat" class="chatslot"></div>
+    </div>
+  </section>
+
+  <!-- Mesa -->
+  <section id="game" class="screen" hidden>
+    <header class="hud">
+      <div class="hud-l"><b id="gRoom"></b><span class="chip">Rodada <b id="gRound"></b></span></div>
+      <div class="hud-c">
+        <div class="mini"><span>Manilha</span><div id="gMan" class="mv"></div></div>
+        <div class="mini"><span>Vira</span><div id="gVira"></div></div>
+        <div class="mini"><span>Tentos</span><b id="gTentos">0</b></div>
+      </div>
+      <div class="hud-r">
+        <button class="icon" id="btnChat" aria-label="Abrir chat">💬<i id="unread" hidden></i></button>
+        <button class="icon" data-act="settings" aria-label="Som e música">♪</button>
+        <button class="icon" id="btnLeave" aria-label="Sair da partida">⏏</button>
+      </div>
+    </header>
+    <div id="stage">
+      <div id="seat-l" class="seat pos-l"></div>
+      <div id="seat-t" class="seat pos-t"></div>
+      <div id="seat-r" class="seat pos-r"></div>
+      <div id="tablewrap">
+        <div id="table">
+          <svg class="tlogo" viewBox="0 0 800 420" aria-hidden="true"><defs><path id="ring" d="M120,210 a280,150 0 1,0 560,0 a280,150 0 1,0 -560,0"/></defs><text><textPath href="#ring" textLength="1370" lengthAdjust="spacing">BOTECO DO ZÉ · CERVEJA GELADA · PETISCO NA MESA · BOTECO DO ZÉ · CERVEJA GELADA ·</textPath></text></svg>
+          <div class="stain s1"></div><div class="stain s2"></div>
+          <div id="trick"></div>
+        </div>
+      </div>
+      <div id="hint" role="status"></div>
+      <div id="bidbox" hidden></div>
+    </div>
+    <footer id="dock">
+      <div id="me" class="mine"></div>
+      <div id="handwrap"><div id="hand"></div><button id="playBtn" class="btn primary" hidden>Jogar carta</button></div>
+      <div id="abCard" class="abwrap"></div>
+    </footer>
+  </section>
+</main>
+
+<!-- Chat (um só componente, muda de lugar entre lobby e partida) -->
+<aside id="chat" class="chat" aria-label="Chat da sala">
+  <div class="chat-h"><b>Papo de mesa</b><button id="chatClose" class="icon" aria-label="Fechar chat">✕</button></div>
+  <div class="tabs"><button class="on" data-t="msgs" type="button">Chat</button><button data-t="log" type="button">Registro</button></div>
+  <div id="chatMsgs" class="msgs" role="log" aria-live="polite"></div>
+  <div id="chatLog" class="msgs logv" hidden></div>
+  <div class="quick"><button type="button">Bora! 🍻</button><button type="button">Boa jogada!</button><button type="button">Quem manda aqui?</button><button type="button">😂</button></div>
+  <form id="chatForm"><input id="chatIn" maxlength="200" placeholder="Digite uma mensagem…" autocomplete="off" aria-label="Mensagem"><button class="btn primary sm" type="submit">Enviar</button></form>
+</aside>
+
+<div id="rollov" hidden></div>
+<div id="modal" hidden></div>
+<div id="toasts" aria-live="assertive"></div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
